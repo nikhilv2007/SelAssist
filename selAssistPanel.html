@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html data-ng-app='myApp' data-ng-csp>
+	<head>
+				
+	</head>
+	<body data-ng-controller='userInputController'>		
+		<div>
+			<form name="myName" novalidate>
+				<div>
+					Locate By : 	
+					<label data-ng-repeat="i in locator">
+						<input type="radio" value={{i}} name="LocateBy" ng-model="$parent.selection">{{i}}
+					</label>		
+				</div>
+				
+				<div>
+					<input id="locatorValue" name="query" type="text" size="100" placeholder="Find element(s)" required ng-model="userEntry" ng-keyup="keyPress($event.keyCode)">
+					<span style="color:red" ng-show="myName.query.$dirty && myName.q.$invalid">
+						<span class="error" ng-if="myName.query.$error.required">Required!</span>
+					</span>
+					<input type="submit" value="Find" ng-if="userEntry.length > 0" ng-click="userEntry.length > 0 && findElement(userEntry, true)">			
+				</div>
+			</form><br>
+			
+			<div style="color:blue">Using single quote(') character in pathvalue is breaking the locator evaluation. Please avoid using it until it's fixed. Thanks</div>
+			<input type='button' value='Copy' ng-click="copyLocatorValue()">
+			<input type='button' value='Clear' ng-click="clearLocatorValue()">
+
+			<!-- search results section -->
+			<div style="color:red">{{message}}</div><br>
+			<div>
+				<ul>
+					<li ng-repeat="res in results">
+						{{res}}						
+					</li>
+				</ul>
+			</div>
+			
+		</div>
+				
+		<script src="js/lib/angular.min.js"</script>
+		<script src="js/lib/angular-route.min.js"></script>	
+		<script src="selAssistPanel.js"></script>
+	</body>
+</html>
