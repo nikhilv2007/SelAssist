@@ -9,7 +9,9 @@
 		
 	"description":"Find all HTML element properties required for Selenium Webdriver automation",
 	
-	"permissions" : ["tabs",
+	"permissions" : [
+        "activeTab",
+        "tabs",
 		"clipboardWrite",
 		"<all_urls>"
 	],

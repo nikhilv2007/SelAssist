@@ -138,4 +138,3 @@ var expValue = function(){
 		return {"Displayed*": displayed, "Selected": selected, "Attribute(s) Name:Value pair": att, "CSS propertyName:Value pair": cssValue, "Text*": text, "Tagname": tagname, "Enabled": enabled, "Rect": rect};
 	}
 };
-

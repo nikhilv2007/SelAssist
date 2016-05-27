@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------------------------------------------
+Source - https://w3c.github.io/webdriver/webdriver-spec.html
+
+[NA]	12.1.1 Dictionary ElementRect Members
+12.1.2 isDisplayed()
+[Done]	12.1.3 isSelected()
+[Done]	12.1.4 getElementAttribute() 
+[Done]	12.1.5 getCssValue()
+12.1.6 getElementText()
+[Done]	12.1.7 getElementTagName()	
+[NA]	12.1.8 ElementRect getElementRect()
+[Done]	12.1.9 isEnabled()
+
+--misc---
+getClass
+getLocation
+getSize

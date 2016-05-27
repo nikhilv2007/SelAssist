@@ -25,13 +25,15 @@
 			<div style="color:blue">Using single quote(') character in pathvalue is breaking the locator evaluation. Please avoid using it until it's fixed. Thanks</div>
 			<input type='button' value='Copy' ng-click="copyLocatorValue()">
 			<input type='button' value='Clear' ng-click="clearLocatorValue()">
-
+            <br>
+            
 			<!-- search results section -->
 			<div style="color:red">{{message}}</div><br>
 			<div>
-				<ul>
-					<li ng-repeat="res in results">
-						{{res}}						
+                <div ng-if="resultCount > 0">Matching elements :-</div>
+				<ul style="list-style-type:none">
+					<li ng-repeat="res in resultElements">
+                        <a href="" style="text-decoration: none;" >{{res}}</a>												
 					</li>
 				</ul>
 			</div>

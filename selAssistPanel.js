@@ -10,10 +10,12 @@ angMain.controller('userInputController', ['$scope', function($scope){
 	$scope.userEntry = '';
 	
 	$scope.message = "";
-
-	$scope.results = [];
+    
+    $scope.resultCount = 0;
+    
+	$scope.resultElements = [];
 		
-	//Reset message when locator selection changes
+	// Reset message when locator selection changes
 	$scope.$watch('selection', function(newVal, oldVal){
 	    $scope.findElement($scope.userEntry, false);
 	});
@@ -47,7 +49,7 @@ angMain.controller('userInputController', ['$scope', function($scope){
 	};
 
 	$scope.keyPress = function(keyCode){
-		console.log("userEntry after keypress - " +$scope.userEntry);
+		//console.log("userEntry after keypress - " +$scope.userEntry);
 		if($scope.userEntry == undefined)
 		{
 			$scope.userEntry = "";
@@ -82,14 +84,26 @@ angMain.controller('userInputController', ['$scope', function($scope){
 		$scope.findElement($scope.userEntry, false);
 						
 	};
-
+ 
 	function getLocatorText(enteredText, findEvent){
 		var locatorType = $scope.selection.replace(/ /g, "").toUpperCase();
-		var locatorText = "";
 		var locatorTextSuffix = findEvent ? "[0]": ".length";
-		console.log(locatorType+ " | " +enteredText);
+		//console.log(locatorType+ " | " +enteredText);
 
-		switch(locatorType){
+        var locatorText = generateDOMQueryString(locatorType, enteredText);
+
+		if(locatorType != "ID")
+			locatorText += locatorTextSuffix;
+
+		//console.log("Locator text - "+ locatorText);
+
+		return locatorText;
+	};
+
+    function generateDOMQueryString(locatorType, enteredText){
+        var locatorText = "";
+        
+        switch(locatorType){
 			case "ID":
 				locatorText = "document.getElementById('"+enteredText+"')";
 				break;
@@ -121,29 +135,25 @@ angMain.controller('userInputController', ['$scope', function($scope){
 			default:
 		      	alert("case not handled yet");	
 		}
-
-		if(locatorType != "ID")
-			locatorText += locatorTextSuffix;
-
-		console.log("Locator text - "+ locatorText);
-
-		return locatorText;
-	};
-
+        
+        return locatorText;
+    }
+    
 	function evaluateContentScript(evaluationText, findEvent){
 		if($scope.selection === "Id" && !findEvent)
 			evaluationText = evaluationText.replace("inspect(", "").replace(")","");
 
-		console.log(evaluationText);
+		//console.log(evaluationText);
 
 		chrome.devtools.inspectedWindow.eval(
 		    evaluationText,
 		    function(result, isException) {
-		    	console.log(result);
-		    	//when find button is clicked don't display matching elements
+		    	//console.log(result);
+		    	// When find button is clicked don't display matching elements
 				if (isException || result == null || result == undefined || result == "0")
 				{
 					$scope.message = "No element found";
+                    $scope.resultCount = 0;
 					//console.log("exception encountered");
 				    //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
 				}
@@ -151,6 +161,7 @@ angMain.controller('userInputController', ['$scope', function($scope){
 				{
 					if(typeof result === "object"){
 						$scope.message = "1 element found";
+                        $scope.resultCount = 1;                        
 					}						
 				}
 				else
@@ -158,11 +169,64 @@ angMain.controller('userInputController', ['$scope', function($scope){
 					if(!isNaN(result) && !findEvent)
 					{						
 						var elementText = parseInt(result) > 1? " elements":" element";           			
-						$scope.message = result + elementText +" found";					
+						$scope.message = result + elementText +" found";
+                        $scope.resultCount = parseInt(result);                        
 					}
 				}
+                
+                if($scope.resultCount > 0){
+                    $scope.resultElements = fetchMatchingElements();
+                    //fetchMatchingElements();
+                }
+                else{
+                    $scope.resultElements = [];
+                }
 				$scope.$apply();				
 			}
      	);
 	};
+    
+    function fetchMatchingElements(){
+        var locatorType = $scope.selection.replace(/ /g, "").toUpperCase();
+        
+        var resultElements = [];
+        
+        var elementLocator = generateDOMQueryString(locatorType, $scope.userEntry);
+        
+        if(locatorType === "ID"){
+            
+            chrome.devtools.inspectedWindow.eval(elementLocator+".outerHTML.replace("+elementLocator+".innerHTML,'')", { useContentScriptContext: true }, function(result, isException){
+                if(isException){
+                     //console.log("Issue occured while getting result element(s)" );
+                     //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                 }
+                 else{
+                     resultElements.push(result);
+                     //$scope.resultElements.push(result);
+                     //console.log(result);
+                 }
+            });
+            
+        }
+        else{
+            // Iterate over all matching elements
+            for ( var i = 0 ; i < $scope.resultCount ; i++ ){
+                //console.log(elementLocator +"[" + i +"].outerHTML.replace("+ elementLocator+ "["+ i+"].innerHTML, '')");
+                chrome.devtools.inspectedWindow.eval(elementLocator +"[" + i +"].outerHTML.replace("+ elementLocator+ "["+ i+"].innerHTML, '')", { useContentScriptContext: true }, function(result, isException){
+                     if(isException){
+                         //console.log("Issue occured while getting result element(s)" );
+                         //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                     }
+                     else{
+                         resultElements.push(result);
+                         //$scope.resultElements.push(result);
+                         //console.log(result);
+                     }
+                 });
+            }
+        }
+        return resultElements;
+    };
+    
+    
 }]);
