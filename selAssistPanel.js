@@ -87,11 +87,12 @@ angMain.controller('userInputController', ['$scope', function($scope){
  
 	function getLocatorText(enteredText, findEvent){
 		var locatorType = $scope.selection.replace(/ /g, "").toUpperCase();
-		var locatorTextSuffix = findEvent ? "[0]": ".length";
+		
 		//console.log(locatorType+ " | " +enteredText);
 
         var locatorText = generateDOMQueryString(locatorType, enteredText);
 
+        var locatorTextSuffix = findEvent ? "[0]": ".length";
 		if(locatorType != "ID")
 			locatorText += locatorTextSuffix;
 
@@ -174,36 +175,35 @@ angMain.controller('userInputController', ['$scope', function($scope){
 					}
 				}
                 
+                //console.log($scope.resultCount);
+                
+                $scope.resultElements.length = 0;
+                
                 if($scope.resultCount > 0){
-                    $scope.resultElements = fetchMatchingElements();
-                    //fetchMatchingElements();
+                    fetchMatchingElements();                    
                 }
-                else{
-                    $scope.resultElements = [];
-                }
-				$scope.$apply();				
+                
+				$scope.$apply();
+                                
 			}
      	);
 	};
     
     function fetchMatchingElements(){
         var locatorType = $scope.selection.replace(/ /g, "").toUpperCase();
-        
-        var resultElements = [];
-        
         var elementLocator = generateDOMQueryString(locatorType, $scope.userEntry);
         
         if(locatorType === "ID"){
             
-            chrome.devtools.inspectedWindow.eval(elementLocator+".outerHTML.replace("+elementLocator+".innerHTML,'')", { useContentScriptContext: true }, function(result, isException){
+            chrome.devtools.inspectedWindow.eval(elementLocator+".outerHTML.replace("+elementLocator+".innerHTML,'')", function(result, isException){
                 if(isException){
                      //console.log("Issue occured while getting result element(s)" );
                      //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
                  }
                  else{
-                     resultElements.push(result);
-                     //$scope.resultElements.push(result);
-                     //console.log(result);
+                     $scope.resultElements.push(result);
+                     $scope.$apply();
+                     //console.log(result);                     
                  }
             });
             
@@ -212,21 +212,42 @@ angMain.controller('userInputController', ['$scope', function($scope){
             // Iterate over all matching elements
             for ( var i = 0 ; i < $scope.resultCount ; i++ ){
                 //console.log(elementLocator +"[" + i +"].outerHTML.replace("+ elementLocator+ "["+ i+"].innerHTML, '')");
-                chrome.devtools.inspectedWindow.eval(elementLocator +"[" + i +"].outerHTML.replace("+ elementLocator+ "["+ i+"].innerHTML, '')", { useContentScriptContext: true }, function(result, isException){
+                chrome.devtools.inspectedWindow.eval(elementLocator +"[" + i +"].outerHTML.replace("+ elementLocator+ "["+ i+"].innerHTML, '')", function(result, isException){
                      if(isException){
                          //console.log("Issue occured while getting result element(s)" );
                          //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
                      }
                      else{
-                         resultElements.push(result);
-                         //$scope.resultElements.push(result);
+                         $scope.resultElements.push(result);
+                         $scope.$apply();
                          //console.log(result);
                      }
                  });
             }
-        }
-        return resultElements;
+        }        
     };
     
-    
+    $scope.highlightElement = function (index){
+        //console.log("Inside highlightElement function with param " + index);
+        var locatorType = $scope.selection.replace(/ /g, "").toUpperCase();
+        
+        var queryText = generateDOMQueryString(locatorType, $scope.userEntry);
+        
+        if(locatorType != "ID")
+            queryText = queryText+ "[" + index + "]";
+        
+        queryText = "inspect(" + queryText + ")";
+        
+        chrome.devtools.inspectedWindow.eval(queryText, 
+            function(result, isException){
+                if(isException){
+                    //console.log("Issue occured while getting result element(s)" );
+                    //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                }
+                else{                         
+                     //console.log(result);
+                }
+            });
+        
+    }
 }]);
