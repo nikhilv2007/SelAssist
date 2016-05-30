@@ -192,6 +192,8 @@ angMain.controller('userInputController', ['$scope', function($scope){
     function fetchMatchingElements(){
         var locatorType = $scope.selection.replace(/ /g, "").toUpperCase();
         var elementLocator = generateDOMQueryString(locatorType, $scope.userEntry);
+        var innerHTMLContent = "";
+        var outerHTMLContent = "";
         
         if(locatorType === "ID"){
             
@@ -203,10 +205,42 @@ angMain.controller('userInputController', ['$scope', function($scope){
                  else{
                      $scope.resultElements.push(result);
                      $scope.$apply();
+                     //console.log(result);
+                 }
+             });
+            
+            /*
+            innerHTMLContent = chrome.devtools.inspectedWindow.eval(elementLocator+".outerHTML", function(result, isException){
+                if(isException){
+                     //console.log("Issue occured while getting result element(s)" );
+                     //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                 }
+                 else{
+                     return result;
+                     }
+            });
+            
+            outerHTMLContent = chrome.devtools.inspectedWindow.eval(elementLocator+".outerHTML", function(result, isException){
+                if(isException){
+                     //console.log("Issue occured while getting result element(s)" );
+                     //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                 }
+                 else{
+                     return result;
+                     //$scope.resultElements.push(result);
+                     //$scope.$apply();
                      //console.log(result);                     
                  }
             });
+                        
+            var removeContent = "";
+            // Check if HTML tags are present. If present remove them.
+            if(innerHTMLContent.indexOf('<') > 0 ){
+                var removeContent = innerHTMLContent.substring(innerHTMLContent.indexOf('<'), innerHTMLContent.lastIndexOf('>'))
+            }
             
+            outerHTMLContent.replace(removeContent, "");
+            */
         }
         else{
             // Iterate over all matching elements
