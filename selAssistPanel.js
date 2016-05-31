@@ -192,11 +192,12 @@ angMain.controller('userInputController', ['$scope', function($scope){
     function fetchMatchingElements(){
         var locatorType = $scope.selection.replace(/ /g, "").toUpperCase();
         var elementLocator = generateDOMQueryString(locatorType, $scope.userEntry);
-        var innerHTMLContent = "";
-        var outerHTMLContent = "";
+        
+        innerHTMLContent = "";
+        outerHTMLContent = "";
         
         if(locatorType === "ID"){
-            
+            /*
             chrome.devtools.inspectedWindow.eval(elementLocator+".outerHTML.replace("+elementLocator+".innerHTML,'')", function(result, isException){
                 if(isException){
                      //console.log("Issue occured while getting result element(s)" );
@@ -208,43 +209,37 @@ angMain.controller('userInputController', ['$scope', function($scope){
                      //console.log(result);
                  }
              });
-            
-            /*
-            innerHTMLContent = chrome.devtools.inspectedWindow.eval(elementLocator+".outerHTML", function(result, isException){
-                if(isException){
-                     //console.log("Issue occured while getting result element(s)" );
-                     //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
-                 }
-                 else{
-                     return result;
-                     }
-            });
-            
-            outerHTMLContent = chrome.devtools.inspectedWindow.eval(elementLocator+".outerHTML", function(result, isException){
-                if(isException){
-                     //console.log("Issue occured while getting result element(s)" );
-                     //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
-                 }
-                 else{
-                     return result;
-                     //$scope.resultElements.push(result);
-                     //$scope.$apply();
-                     //console.log(result);                     
-                 }
-            });
-                        
-            var removeContent = "";
-            // Check if HTML tags are present. If present remove them.
-            if(innerHTMLContent.indexOf('<') > 0 ){
-                var removeContent = innerHTMLContent.substring(innerHTMLContent.indexOf('<'), innerHTMLContent.lastIndexOf('>'))
-            }
-            
-            outerHTMLContent.replace(removeContent, "");
             */
+            
+            chrome.devtools.inspectedWindow.eval(elementLocator+".innerHTML", function(result, isException){
+                if(isException){
+                    //console.log("Issue occured while getting result element(s)" );
+                    //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                }
+                else{
+                    innerHTMLContent = result;
+                    //console.log("InnerHTML - " +innerHTMLContent);                    
+                }
+            });
+            
+            chrome.devtools.inspectedWindow.eval(elementLocator+".outerHTML", function(result, isException){
+                if(isException){
+                    //console.log("Issue occured while getting result element(s)" );
+                    //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                 }
+                else{
+                    outerHTMLContent = result;
+                    //console.log("OuterHTML - "+outerHTMLContent);
+                    
+                    removeInnerTags(innerHTMLContent, outerHTMLContent);
+                 }
+            });        
+            
         }
         else{
             // Iterate over all matching elements
             for ( var i = 0 ; i < $scope.resultCount ; i++ ){
+                /*
                 //console.log(elementLocator +"[" + i +"].outerHTML.replace("+ elementLocator+ "["+ i+"].innerHTML, '')");
                 chrome.devtools.inspectedWindow.eval(elementLocator +"[" + i +"].outerHTML.replace("+ elementLocator+ "["+ i+"].innerHTML, '')", function(result, isException){
                      if(isException){
@@ -257,9 +252,46 @@ angMain.controller('userInputController', ['$scope', function($scope){
                          //console.log(result);
                      }
                  });
+                 */
+                chrome.devtools.inspectedWindow.eval(elementLocator+"["+i+"].innerHTML", function(result, isException){
+                    if(isException){
+                        //console.log("Issue occured while getting result element(s)" );
+                        //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                    }
+                    else{
+                        innerHTMLContent = result;
+                        //console.log("InnerHTML - " +innerHTMLContent);
+                    }
+                });
+
+                chrome.devtools.inspectedWindow.eval(elementLocator+"["+i+"].outerHTML", function(result, isException){
+                    if(isException){
+                        //console.log("Issue occured while getting result element(s)" );
+                        //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                     }
+                    else{
+                        outerHTMLContent = result;
+                        //console.log("OuterHTML - "+outerHTMLContent);
+
+                        removeInnerTags(innerHTMLContent, outerHTMLContent);
+                     }
+                });
             }
         }        
     };
+    
+    // Remove inner tags from matching tag and retain current tag innertext
+    function removeInnerTags(innerHTMLContent, outerHTMLContent){
+        // Check if HTML tags are present. If present remove them.
+        if(innerHTMLContent.indexOf('<') > -1 ){
+            var removalContent = innerHTMLContent.substring(innerHTMLContent.indexOf('<'), innerHTMLContent.lastIndexOf('>')+1)
+            //console.log("RemoveContent - "+removalContent);
+        }
+        
+        //console.log("After removing - " +outerHTMLContent.replace(removalContent, ''));
+        $scope.resultElements.push(outerHTMLContent.replace(removalContent, ''));
+        $scope.$apply();
+    }
     
     $scope.highlightElement = function (index){
         //console.log("Inside highlightElement function with param " + index);

@@ -12,7 +12,7 @@
 						<input type="radio" value={{i}} name="LocateBy" ng-model="$parent.selection">{{i}}
 					</label>		
 				</div>
-				
+				<br>
 				<div>
 					<input id="locatorValue" name="query" type="text" size="100" placeholder="Find element(s)" required ng-model="userEntry" ng-keyup="keyPress($event.keyCode)">
 					<span style="color:red" ng-show="myName.query.$dirty && myName.q.$invalid">
