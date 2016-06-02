@@ -44,6 +44,7 @@ angMain.controller('userInputController', ['$scope', function($scope){
 		else
 		{
 			$scope.message = "";
+            $scope.resultElements.length = 0;
 		}
 		
 	};
@@ -293,7 +294,7 @@ angMain.controller('userInputController', ['$scope', function($scope){
         $scope.$apply();
     }
     
-    $scope.highlightElement = function (index){
+    $scope.highlightInElementsPanel = function (index){
         //console.log("Inside highlightElement function with param " + index);
         var locatorType = $scope.selection.replace(/ /g, "").toUpperCase();
         
@@ -315,5 +316,49 @@ angMain.controller('userInputController', ['$scope', function($scope){
                 }
             });
         
+    }
+    
+    // Focus/highlight matching element on webpage
+    $scope.focusElement = function(index){
+        //console.log("inside focus element function");
+        var locatorType = $scope.selection.replace(/ /g, "").toUpperCase();
+        
+        var queryText = generateDOMQueryString(locatorType, $scope.userEntry);
+        
+        if(locatorType != "ID")
+            queryText = queryText+ "[" + index + "]";
+        
+        chrome.devtools.inspectedWindow.eval("highlightElement("+queryText+")", {useContentScriptContext:true},
+            function(result, isException){
+                if(isException){
+                    //console.log("Issue occured while getting result element(s)" );
+                    //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                }
+                else{                         
+                     //console.log(result);
+                }
+            }); 
+    }
+    
+    // Undo above changes
+    $scope.removeFocus = function(index){
+        //console.log("inside remove focus function");
+        var locatorType = $scope.selection.replace(/ /g, "").toUpperCase();
+        
+        var queryText = generateDOMQueryString(locatorType, $scope.userEntry);
+        
+        if(locatorType != "ID")
+            queryText = queryText+ "[" + index + "]";
+        
+        chrome.devtools.inspectedWindow.eval("removeHighlight("+queryText+")", {useContentScriptContext:true},
+            function(result, isException){
+                if(isException){
+                    //console.log("Issue occured while getting result element(s)" );
+                    //console.log(isException.isError +"<>"+ isException.code +"<>"+ isException.description +"<>"+ isException.details +"<>"+ isException.isException +"<>"+ isException.value +"<>");
+                }
+                else{                         
+                     //console.log(result);
+                }
+            });
     }
 }]);

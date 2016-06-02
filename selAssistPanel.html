@@ -30,10 +30,10 @@
 			<!-- search results section -->
 			<div style="color:red">{{message}}</div><br>
 			<div>
-                <div ng-if="resultCount > 0">Matching elements :-</div>
+                <div ng-if="resultCount > 0 && resultElements.length > 0">Matching elements :-</div>
 				<ul style="list-style-type:none">
 					<li ng-repeat="res in resultElements track by $index">
-                        <a href="" style="text-decoration: none;" ng-click="highlightElement($index)"><span ng-if="selection!='Id'">{{$index}}. </span>{{res}}</a>												
+                        <a href="" style="text-decoration: none;" ng-click="highlightInElementsPanel($index)" ng-mouseenter="focusElement($index)" ng-mouseleave="removeFocus($index)"><span ng-if="selection!='Id'">{{$index}}. </span>{{res}}</a>												
 					</li>
 				</ul>
 			</div>
