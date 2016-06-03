@@ -19,7 +19,7 @@ function highlightElement(element){
     
     // Scroll to the element on webpage
     var position = getPosition(element);
-    window.scrollTo(position.x, position.y);
+    window.scrollTo(position.x, position.y-150);
     
     element.classList.add("selassist-highlight");
 }

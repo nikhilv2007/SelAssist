@@ -39,7 +39,7 @@ angMain.controller('userInputController', ['$scope', function($scope){
 		// findEvent = true when element highlight needed else false
 		if(textEntered != "")
 		{			
-			evaluateContentScript("inspect("+getLocatorText(textEntered, findEvent)+")", findEvent);
+			evaluateContentScript(getLocatorText(textEntered, findEvent), findEvent);
 		}
 		else
 		{
@@ -142,9 +142,9 @@ angMain.controller('userInputController', ['$scope', function($scope){
     }
     
 	function evaluateContentScript(evaluationText, findEvent){
-		if($scope.selection === "Id" && !findEvent)
-			evaluationText = evaluationText.replace("inspect(", "").replace(")","");
-
+		if(findEvent)
+            evaluationText = "inspect("+ evaluationText + ")";
+        
 		//console.log(evaluationText);
 
 		chrome.devtools.inspectedWindow.eval(
@@ -304,7 +304,7 @@ angMain.controller('userInputController', ['$scope', function($scope){
             queryText = queryText+ "[" + index + "]";
         
         queryText = "inspect(" + queryText + ")";
-        
+        //console.log("query text inside highlightInElementsPanel "+queryText);
         chrome.devtools.inspectedWindow.eval(queryText, 
             function(result, isException){
                 if(isException){
