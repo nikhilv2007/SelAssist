@@ -361,4 +361,16 @@ angMain.controller('userInputController', ['$scope', function($scope){
                 }
             });
     }
+    
+    // Set result list element height when selassist panel loaded
+    window.addEventListener('load',function(){
+        //console.log("selassist panel loaded");
+        document.getElementById('resultList').style.height = (window.innerHeight-120).toString() +"px";
+    })
+    
+    // Set result list element height when selassist panel resized
+    window.addEventListener('resize',function(){
+        //console.log("selassist panel resized");
+        document.getElementById('resultList').style.height = (window.innerHeight-120).toString() +"px";
+    })
 }]);

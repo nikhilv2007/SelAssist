@@ -1,6 +1,6 @@
 //console.log("content script loaded");
 
-var css = '.selassist-highlight { border: thick dotted red; border-radius: 5px; opacity:0.5; background-color: yellow; }',
+var css = '.selassist-highlight { outline: thick dotted red; opacity:0.5; background-color: yellow; }',
     head = document.head || document.getElementsByTagName('head')[0],
     style = document.createElement('style');
 

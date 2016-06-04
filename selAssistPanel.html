@@ -7,7 +7,7 @@
             }
         </style>		
 	</head>
-	<body data-ng-controller='userInputController'>		
+	<body data-ng-controller='userInputController' style="margin:5px">		
 		<div>
 			<form name="myName" novalidate>
 				<div>
@@ -16,15 +16,14 @@
 						<input type="radio" value={{i}} name="LocateBy" ng-model="$parent.selection">{{i}}
 					</label>		
 				</div>
-				<br>
-				<div>
+				<div style="padding:5px;">
 					<input id="locatorValue" name="query" type="text" size="100" placeholder="Find element(s)" required ng-model="userEntry" ng-keyup="keyPress($event.keyCode)">
 					<span style="color:red" ng-show="myName.query.$dirty && myName.q.$invalid">
 						<span class="error" ng-if="myName.query.$error.required">Required!</span>
 					</span>
-					<input type="submit" value="Find" ng-if="userEntry.length > 0" ng-click="userEntry.length > 0 && findElement(userEntry, true)">			
+					<input type="submit" value="Find" ng-if="userEntry.length > 0" ng-click="userEntry.length > 0 && findElement(userEntry, true)">	
 				</div>
-			</form><br>
+			</form>
 			
 			<div style="color:blue">Using single quote(') character in pathvalue is breaking the locator evaluation. Please avoid using it until it's fixed. Thanks</div>
 			<input type='button' value='Copy' ng-click="copyLocatorValue()">
@@ -32,17 +31,16 @@
             <br>
             
 			<!-- search results section -->
-			<div style="color:red">{{message}}</div><br>
-			<div>
-                <div ng-if="resultCount > 0 && resultElements.length > 0">Matching elements (Hover on result item to view element on page, Click to view in DOM):-</div>
-				<ul style="list-style-type:none">
-					<li ng-repeat="res in resultElements track by $index">
-                        <a href="" style="text-decoration: none;" ng-click="highlightInElementsPanel($index)" ng-mouseenter="focusElement($index)" ng-mouseleave="removeFocus($index)"><span ng-if="selection!='Id'">{{$index}}. </span>{{res}}</a>
-					</li>
-				</ul>
-			</div>
-			
-		</div>
+			<div style="color:red; padding: 5px 0px; border-bottom: 1px dotted black">{{message}} <span style="color:black;" ng-if="resultCount > 0 && resultElements.length > 0">(Hover on result item to view element on page, click to view in DOM)</span></div>
+        </div>
+        
+        <div id="resultList" style="overflow:auto">
+            <ul style="list-style-type:none; margin:0px; padding-left: 8px;">
+                <li ng-repeat="res in resultElements track by $index">
+                    <a href="" style="text-decoration: none;" ng-click="highlightInElementsPanel($index)" ng-mouseenter="focusElement($index)" ng-mouseleave="removeFocus($index)"><span ng-if="selection!='Id'">{{$index}}. </span>{{res}}</a>
+                </li>
+            </ul>
+        </div>
 				
 		<script src="js/lib/angular.min.js"</script>
 		<script src="js/lib/angular-route.min.js"></script>	
