@@ -115,9 +115,9 @@ var expValue = function(){
 		var rectElem = $0, rect = {x:0, y:0, height:$0.offsetHeight, width:$0.offsetWidth };
 		
 		do{
-			rect.x += rectElem.offsetLeft;
+			rect.x += (rectElem.offsetLeft - rectElem.scrollLeft + rectElem.clientLeft);
 			rect.y += rectElem.offsetTop;
-			rectElem = rectElem.offsetparent;
+			rectElem = rectElem.offsetParent;
 		}while(rectElem);
 		
 				
