@@ -1,6 +1,6 @@
 //console.log("content script loaded");
 
-var css = '.selassist-highlight { outline: thick dotted red; opacity: 0.5; background-color: yellow; } .selassist-tooltiptext { font-size: 12px !Important; opacity:1 !Important; background-color: black; color: #37EF50; text-align: center;  border-radius: 6px; padding: 5px; position: fixed; z-index: 999999999999;} .selassist-tooltiptext::after { content: " "; position: absolute; top: 100%; left: 50%; margin-left: -8px; border-width: 8px; border-style: solid; border-color: black transparent transparent transparent;}',          
+var css = '.selassist-highlight { outline: thick dotted red; opacity: 0.5; background-color: yellow; } .selassist-tooltiptext-top { font-size: 12px !Important; opacity:1 !Important; background-color: black; color: #37EF50; text-align: center;  border-radius: 6px; padding: 5px; position: fixed; z-index: 999999999999;} .selassist-tooltiptext-top::after { content: " "; position: absolute; top: 100%; left: 20%; margin-left: -8px; border-width: 8px; border-style: solid; border-color: black transparent transparent transparent;} .selassist-tooltiptext-bottom { font-size: 12px !Important; opacity:1 !Important; background-color: black; color: #37EF50; text-align: center;  border-radius: 6px; padding: 5px; position: fixed; z-index: 999999999999;} .selassist-tooltiptext-bottom::after { content: " "; position: absolute; bottom: 100%; left: 20%; margin-left: -8px; border-width: 8px; border-style: solid; border-color: black transparent transparent transparent; transform: rotate(180deg);}',          
     head = document.head || document.getElementsByTagName('head')[0],
     style = document.createElement('style');
 
@@ -25,11 +25,18 @@ function highlightElement(element){
     
     // HTML Element pointer
     var node = document.createElement("SPAN");
-    var textnode = document.createTextNode("Here");
+    var textnode = document.createTextNode("Matching Element");
     node.appendChild(textnode);
-    node.setAttribute("class", "selassist-tooltiptext")
+    
     var pos = element.getBoundingClientRect();
-    node.style.top = pos.top - 35 +"px";
+    if (pos.top > 25){
+        node.setAttribute("class", "selassist-tooltiptext-top");
+        node.style.top = pos.top - 35 +"px";        
+    }
+    else{
+        node.setAttribute("class", "selassist-tooltiptext-bottom");
+        node.style.top = pos.top + pos.height + 8 +"px";
+    }
     node.style.left = pos.left +"px";
     document.body.appendChild(node);
 }
@@ -40,7 +47,12 @@ function removeHighlight(element){
     element.classList.remove("selassist-highlight");
     
     // Remove element pointer
-    document.body.removeChild(document.body.querySelector('span.selassist-tooltiptext'));
+    if(document.body.querySelector('span.selassist-tooltiptext-top')){
+        document.body.removeChild(document.body.querySelector('span.selassist-tooltiptext-top'));
+    }
+    else{
+        document.body.removeChild(document.body.querySelector('span.selassist-tooltiptext-bottom'));
+    }
 }
 
 // Retrieve coordinates of an HTML element
