@@ -373,4 +373,22 @@ angMain.controller('userInputController', ['$scope', function($scope){
         //console.log("selassist panel resized");
         document.getElementById('resultList').style.height = (window.innerHeight-120).toString() +"px";
     })
+    
+    // Create a connection to the background page ( reload devtools when webpage is loaded )
+    var backgroundPageConnection = chrome.runtime.connect({
+        name: "panel"
+    });
+    
+    backgroundPageConnection.postMessage({
+        name: 'init',
+        tabId: chrome.devtools.inspectedWindow.tabId
+    });
+    
+    backgroundPageConnection.onMessage.addListener(function(msg) {
+        if (msg.action == "refresh"){
+            // Reload the SelAssist panel
+            location.reload();
+        }    
+    });    
+    
 }]);

@@ -13,6 +13,9 @@ if (style.styleSheet){
 
 head.appendChild(style);
 
+// Send message to background and in turn to devtool to refresh SelAssist panel
+chrome.runtime.sendMessage({action: "refresh"}, function(response) {});
+
 // Highlight element
 function highlightElement(element){
     //console.log("content_script - inside highlight function");
