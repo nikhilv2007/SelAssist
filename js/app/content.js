@@ -1,17 +1,28 @@
 //console.log("content script loaded");
 
-var css = '.selassist-highlight { outline: thick dotted red; opacity: 0.5; background-color: yellow; } .selassist-tooltiptext-top { font-size: 12px !Important; opacity:1 !Important; background-color: black; color: #37EF50; text-align: center;  border-radius: 6px; padding: 5px; position: fixed; z-index: 999999999999;} .selassist-tooltiptext-top::after { content: " "; position: absolute; top: 100%; left: 20%; margin-left: -8px; border-width: 8px; border-style: solid; border-color: black transparent transparent transparent;} .selassist-tooltiptext-bottom { font-size: 12px !Important; opacity:1 !Important; background-color: black; color: #37EF50; text-align: center;  border-radius: 6px; padding: 5px; position: fixed; z-index: 999999999999;} .selassist-tooltiptext-bottom::after { content: " "; position: absolute; bottom: 100%; left: 20%; margin-left: -8px; border-width: 8px; border-style: solid; border-color: black transparent transparent transparent; transform: rotate(180deg);}',          
-    head = document.head || document.getElementsByTagName('head')[0],
-    style = document.createElement('style');
+var selassistStyleLoaded = false;
 
-style.type = 'text/css';
-if (style.styleSheet){
-  style.styleSheet.cssText = css;
-} else {
-  style.appendChild(document.createTextNode(css));
+function loadSelAssistStyle(){
+    if(!selassistStyleLoaded){
+        //console.log("Loading style for SelAssist");
+    
+        var css = '.selassist-highlight { outline: thick dotted red; opacity: 0.5; background-color: yellow; } .selassist-tooltiptext-top { font-size: 12px !Important; opacity:1 !Important; background-color: black; color: #37EF50; text-align: center;  border-radius: 6px; padding: 5px; position: fixed; z-index: 999999999999;} .selassist-tooltiptext-top::after { content: " "; position: absolute; top: 100%; left: 20%; margin-left: -8px; border-width: 8px; border-style: solid; border-color: black transparent transparent transparent;} .selassist-tooltiptext-bottom { font-size: 12px !Important; opacity:1 !Important; background-color: black; color: #37EF50; text-align: center;  border-radius: 6px; padding: 5px; position: fixed; z-index: 999999999999;} .selassist-tooltiptext-bottom::after { content: " "; position: absolute; bottom: 100%; left: 20%; margin-left: -8px; border-width: 8px; border-style: solid; border-color: black transparent transparent transparent; transform: rotate(180deg);}',          
+            head = document.head || document.getElementsByTagName('head')[0],
+            style = document.createElement('style');
+
+        style.type = 'text/css';
+    
+        if (style.styleSheet){
+          style.styleSheet.cssText = css;
+        } else {
+          style.appendChild(document.createTextNode(css));
+        }
+
+        head.appendChild(style);
+        
+        selassistStyleLoaded = true;
+    }
 }
-
-head.appendChild(style);
 
 // Send message to background and in turn to devtool to refresh SelAssist panel
 chrome.runtime.sendMessage({action: "refresh"}, function(response) {});

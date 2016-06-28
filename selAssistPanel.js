@@ -366,6 +366,9 @@ angMain.controller('userInputController', ['$scope', function($scope){
     window.addEventListener('load',function(){
         //console.log("selassist panel loaded");
         document.getElementById('resultList').style.height = (window.innerHeight-120).toString() +"px";
+        
+        // Load SelAssist related style into the webpage
+        chrome.devtools.inspectedWindow.eval("loadSelAssistStyle()", {useContentScriptContext:true})
     })
     
     // Set result list element height when selassist panel resized
